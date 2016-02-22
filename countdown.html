@@ -1,0 +1,192 @@
+<html>
+<head>
+<title>Countdown</title>
+<style>
+
+#countdown {
+	display: none;
+	color: black;
+	font-weight: bold;
+	font-size: 16pt;
+}
+
+#updates {
+	disply: inline-block;
+	width: 110px;
+	margin: 0;
+	text-align: center;
+	font-style: oblique;
+}
+
+#timer {
+	disply: inline-block;
+	width: 110px;
+	margin: 0;
+	text-align: center;
+	border-style: solid;
+	border-width: 1px 0px 1px 0px;
+	border-color: black;
+}
+
+@-webkit-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@-webkit-keyframes fadeOut { from { opacity:1; } to { opacity:0; } }
+.fade-in {
+	opacity: 0;  /* make things invisible upon start */
+	-webkit-animation: fadeIn ease-in 1;  /* call our keyframe named fadeIn, use animattion ease-in and repeat it only 1 time */
+	-webkit-animation-fill-mode: forwards;  /* this makes sure that after animation is done we remain at the last keyframe value (opacity: 1)*/
+	-webkit-animation-duration: 0.5s;
+}
+.fade-out {
+	opacity: 1;  /* make things invisible upon start */
+	-webkit-animation: fadeOut ease-in 1;  /* call our keyframe named fadeOut, use animattion ease-in and repeat it only 1 time */
+	-webkit-animation-fill-mode: forwards;  /* this makes sure that after animation is done we remain at the last keyframe value (opacity: 0)*/
+	-webkit-animation-duration: 0.5s;
+}
+
+</style>
+</head>
+<body>
+
+<div id="setup">
+	<button onclick="start();">Start</button>
+	Hrs: <input type="text" id="inputHrs" size="3" value="0">
+	Mins: <input type="text" id="inputMins" size="2" value="5">
+</div>
+
+<div id="countdown">
+	<span id="updates">&nbsp;</span>
+	<span id="timer">&nbsp;</span>
+</div>
+
+
+<script>
+
+var endText = 'Finished!';
+
+var endTime;
+var setup = document.querySelector('#setup');
+var countdown = document.querySelector('#countdown');
+var updates = document.querySelector('#updates');
+var timer = document.querySelector('#timer');
+var gui = require("nw.gui");
+
+function start() {
+	setup.style.display = 'none';
+
+	 //60*60*1000 = 3600000
+	var addHours = parseInt(document.querySelector('#inputHrs').value)*3600000;
+
+	 // 60*1000 = 60000
+	var addMinutes = parseInt(document.querySelector('#inputMins').value)*60000;
+
+	// Not used for now
+	var addSeconds = 0*1000;
+
+	var newTime = addHours + addMinutes + addSeconds;
+
+	endTime = new Date( parseInt(Date.now()) + newTime );
+
+	countdown.style.display = 'inline-block';
+	updates.style.display = 'inline-block';
+	timer.style.display = 'inline-block';
+
+	hotkeys();
+	refreshCountdown();
+
+	return false;
+}
+
+function refreshCountdown() {
+	var timeleft = endTime.getTime() - Date.now();
+	if ( timeleft > 0 ) { // Continue
+		var hrs = Math.floor( timeleft / 3600000 ); //60*60*1000 = 3600000
+		hrs = (hrs>9)?hrs:('0'+hrs);
+		var mins = Math.floor( (timeleft % 3600000) / 60000 );
+		mins = (mins>9)?mins:('0'+mins);
+		var secs = Math.floor( (timeleft % 60000) / 1000 );
+		secs = (secs>9)?secs:('0'+secs);
+		var tenths = Math.floor( (timeleft % 1000) / 100 );
+		timer.innerHTML = `${hrs}:${mins}:${secs}.${tenths}`;
+		setTimeout(refreshCountdown, 33); //30 fps = 33.33ms
+	}
+	else { // Finish
+		countdown.innerHTML = endText;
+	}
+}
+
+// see: https://github.com/nwjs/nw.js/wiki/Shortcut
+function hotkeys() {
+	// +5 minutes
+	var shortcutPlusFive = new gui.Shortcut( {
+		key : 'Ctrl+Period',
+		active : function () {
+			if (endTime) {
+				endTime.setTime( endTime.getTime() + 5*60*1000 );
+				fade('+5 min');
+			}
+		},
+		failed : function(msg) {
+			console.log(msg);
+		}
+	} );
+	gui.App.registerGlobalHotKey(shortcutPlusFive);
+
+	// -5 minutes
+	var shortcutMinusFive = new gui.Shortcut( {
+		key : 'Shift+Ctrl+Period',
+		active : function () {
+			if (endTime) {
+				endTime.setTime( endTime.getTime() - 5*60*1000 );
+				fade('-5 min');
+			}
+		},
+		failed : function(msg) {
+			console.log(msg);
+		}
+	} );
+	gui.App.registerGlobalHotKey(shortcutMinusFive);
+
+	// +1 minute
+	var shortcutPlusOne = new gui.Shortcut( {
+		key : 'Ctrl+Comma',
+		active : function () {
+			if (endTime) {
+				endTime.setTime( endTime.getTime() + 1*60*1000 );
+				fade('+1 min');
+			}
+		},
+		failed : function(msg) {
+			console.log(msg);
+		}
+	} );
+	gui.App.registerGlobalHotKey(shortcutPlusOne);
+
+	// -1 minute
+	var shortcutMinusOne = new gui.Shortcut( {
+		key : 'Shift+Ctrl+Comma',
+		active : function () {
+			if (endTime) {
+				endTime.setTime( endTime.getTime() - 1*60*1000 );
+				fade('-1 min');
+			}
+		},
+		failed : function(msg) {
+			console.log(msg);
+		}
+	} );
+	gui.App.registerGlobalHotKey(shortcutMinusOne);
+}
+
+function fade(text) {
+	updates.innerHTML = text;
+	updates.className = 'fade-in';
+	setTimeout(function() {
+		updates.className = 'fade-out';
+	}, 1*1000);
+
+}
+
+</script>
+
+</body>
+</html>

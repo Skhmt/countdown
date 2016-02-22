@@ -1,0 +1,12 @@
+{
+	"name": "countdown",
+	"description": "blah",
+	"version": "1",
+	"main": "countdown.html",
+	"window": {
+		"width": 250,
+		"height": 60,
+		"toolbar": false,
+		"frame": true
+	}
+}

@@ -15,6 +15,6 @@ Use `Shift + Ctrl + .` to decrease time by 5 minutes
 
 Use `Shift + Ctrl + ,` to decrease time by 1 minute
 
-Hotkeys work globally.
+Hotkeys work globally. As in, they will work even if you're in a game.
 
 Edit `countdown.html` to change styles and/or the end text.

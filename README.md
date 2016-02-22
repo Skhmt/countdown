@@ -1,5 +1,5 @@
 # countdown-timer
-**Installing**
+## Installing
 * Download [nw.js](http://nwjs.io/) or get it from the app store if on OS X
 * Place `package.json` and `countdown.html` into the same folder as nw.exe (Windows) or nw.app (OS X)
 * Run nw.exe or nw.app
@@ -19,7 +19,7 @@ Hotkeys work globally. As in, they will work even if you're in a game.
 
 Edit `countdown.html` to change styles and/or the end text.
 
-**License**
+## License
 
 The MIT License (MIT)
 

@@ -1,5 +1,5 @@
 # countdown-timer
-*** To install: ***
+**To install:**
 * Download (nw.js)[http://nwjs.io/] or on the app store if on OS X
 * Place package.json and countdown.html into the same folder as nw.exe (Windows) or nw.app (OS X)
 * Run nw.exe or nw.app

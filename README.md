@@ -1,6 +1,6 @@
 # countdown-timer
 **To install:**
-* Download (nw.js)[http://nwjs.io/] or on the app store if on OS X
+* Download [nw.js](http://nwjs.io/) or get it from the app store if on OS X
 * Place package.json and countdown.html into the same folder as nw.exe (Windows) or nw.app (OS X)
 * Run nw.exe or nw.app
 * Enter hours and minutes

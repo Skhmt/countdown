@@ -19,9 +19,7 @@ Hotkeys work globally. As in, they will work even if you're in a game.
 
 Edit `countdown.html` to change styles and/or the end text.
 
-### License
-
-The MIT License (MIT)
+### The MIT License (MIT)
 
 Copyright (c) 2016 skhmt
 

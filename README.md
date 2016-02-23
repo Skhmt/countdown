@@ -15,6 +15,8 @@ Use `Shift + Ctrl + .` to decrease time by 5 minutes
 
 Use `Shift + Ctrl + ,` to decrease time by 1 minute
 
+Use `Ctrl + P` to pause or play the timer
+
 Hotkeys work globally. As in, they will work even if you're in a game.
 
 Edit `countdown.html` to change styles and/or the end text.

@@ -74,16 +74,19 @@
 
 </style>
 <script>
-	var endText = 'Finished!';
 </script>
 </head>
 <body class="normal">
 
 <div id="setup">
 	<button onclick="start();">Start</button>
+	&nbsp;
+	<button onclick="invertcolors();">Invert colors</button>
+	<br>
 	Hrs: <input type="text" id="inputHrs" size="3" value="0">
 	Mins: <input type="text" id="inputMins" size="2" value="5">
-	<button onclick="invertcolors();">Invert colors</button>
+	<br>
+	End text: <input type="text" id="endText" size="15" value="Finished">
 </div>
 
 <div id="countdown">
@@ -101,6 +104,7 @@ var updates = document.querySelector('#updates');
 var timer = document.querySelector('#timer');
 var gui = require("nw.gui");
 var pausedTime;
+var isStarted = false;
 
 function invertcolors() {
 	var body = document.querySelector('body');
@@ -113,9 +117,11 @@ function invertcolors() {
 }
 
 function start() {
+	isStarted = true;
+
 	setup.style.display = 'none';
 
-	 //60*60*1000 = 3600000
+	 // 60*60*1000 = 3600000
 	var addHours = parseInt(document.querySelector('#inputHrs').value)*3600000;
 
 	 // 60*1000 = 60000
@@ -155,7 +161,7 @@ function refreshCountdown() {
 		setTimeout(refreshCountdown, 33); //30 fps = 33.33ms
 	}
 	else { // Finish
-		countdown.innerHTML = endText;
+		countdown.innerHTML = document.querySelector('#endText').value;
 	}
 }
 
@@ -165,13 +171,13 @@ function hotkeys() {
 	var shortcutPausePlay = new gui.Shortcut( {
 		key : 'Ctrl+P',
 		active : function () {
-			if ( pausedTime ) { // if paused, unpause and play
+			if ( pausedTime && isStarted ) { // if paused, unpause and play
 				var timeDifference = (new Date).getTime() - pausedTime;
 				endTime.setTime( endTime.getTime() + timeDifference );
 				updates.className = 'fade-out';
 				pausedTime = null;
 			}
-			else { // if playing, set paused time
+			else if ( !pausedTime && isStarted ) { // if playing, set paused time
 				updates.innerHTML = `paused`;
 				updates.className = 'blink';
 				pausedTime = (new Date).getTime();
@@ -187,7 +193,7 @@ function hotkeys() {
 	var shortcutPlusFive = new gui.Shortcut( {
 		key : 'Ctrl+Period',
 		active : function () {
-			if (endTime && !pausedTime) {
+			if ( endTime && !pausedTime && isStarted ) {
 				endTime.setTime( endTime.getTime() + 5*60*1000 );
 				fade('+5 min');
 			}
@@ -202,7 +208,7 @@ function hotkeys() {
 	var shortcutMinusFive = new gui.Shortcut( {
 		key : 'Shift+Ctrl+Period',
 		active : function () {
-			if (endTime && !pausedTime) {
+			if ( endTime && !pausedTime && isStarted ) {
 				endTime.setTime( endTime.getTime() - 5*60*1000 );
 				fade('-5 min');
 			}
@@ -217,7 +223,7 @@ function hotkeys() {
 	var shortcutPlusOne = new gui.Shortcut( {
 		key : 'Ctrl+Comma',
 		active : function () {
-			if (endTime && !pausedTime) {
+			if ( endTime && !pausedTime && isStarted ) {
 				endTime.setTime( endTime.getTime() + 1*60*1000 );
 				fade('+1 min');
 			}
@@ -232,7 +238,7 @@ function hotkeys() {
 	var shortcutMinusOne = new gui.Shortcut( {
 		key : 'Shift+Ctrl+Comma',
 		active : function () {
-			if (endTime && !pausedTime) {
+			if ( endTime && !pausedTime && isStarted ) {
 				endTime.setTime( endTime.getTime() - 1*60*1000 );
 				fade('-1 min');
 			}

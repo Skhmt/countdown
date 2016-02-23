@@ -4,9 +4,36 @@
 <style>
 #countdown {
 	display: none;
-	color: black;
 	font-weight: bold;
 	font-size: 16pt;
+}
+
+.normal {
+	color: black;
+	background-color: white;
+	border-color: black;
+	text-shadow: 1px 1px 1px #fff,
+		-1px -1px 1px #fff,
+		1px -1px 1px #fff,
+		-1px 1px 1px #fff,
+		0px 1px 1px #fff,
+		1px 0px 1px #fff,
+		0px -1px 1px #fff,
+		-1px 0px 1px #fff;
+}
+
+.invert {
+	color: white;
+	background-color: black;
+	border-color: white;
+	text-shadow: 1px 1px 1px #000,
+		-1px -1px 1px #000,
+		1px -1px 1px #000,
+		-1px 1px 1px #000,
+		0px 1px 1px #000,
+		1px 0px 1px #000,
+		0px -1px 1px #000,
+		-1px 0px 1px #000;
 }
 
 #updates {
@@ -24,7 +51,6 @@
 	text-align: center;
 	border-style: solid;
 	border-width: 1px 0px 1px 0px;
-	border-color: black;
 }
 
 @-webkit-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
@@ -41,17 +67,23 @@
 	-webkit-animation-fill-mode: forwards;
 	-webkit-animation-duration: 0.5s;
 }
+@-webkit-keyframes blink-animation { to { visibility: hidden; } }
+.blink {
+  -webkit-animation: blink-animation 1s steps(5, start) infinite;
+}
+
 </style>
 <script>
 	var endText = 'Finished!';
 </script>
 </head>
-<body>
+<body class="normal">
 
 <div id="setup">
 	<button onclick="start();">Start</button>
 	Hrs: <input type="text" id="inputHrs" size="3" value="0">
 	Mins: <input type="text" id="inputMins" size="2" value="5">
+	<button onclick="invertcolors();">Invert colors</button>
 </div>
 
 <div id="countdown">
@@ -68,6 +100,17 @@ var countdown = document.querySelector('#countdown');
 var updates = document.querySelector('#updates');
 var timer = document.querySelector('#timer');
 var gui = require("nw.gui");
+var pausedTime;
+
+function invertcolors() {
+	var body = document.querySelector('body');
+	if (body.className === 'invert ') {
+		body.className = 'normal';
+	}
+	else {
+		body.className = 'invert';
+	}
+}
 
 function start() {
 	setup.style.display = 'none';
@@ -97,7 +140,10 @@ function start() {
 
 function refreshCountdown() {
 	var timeleft = endTime.getTime() - Date.now();
-	if ( timeleft > 0 ) { // Continue
+	if ( pausedTime ) {
+		setTimeout(refreshCountdown, 33); //30 fps = 33.33ms
+	}
+	else if ( timeleft > 0 ) { // Continue
 		var hrs = Math.floor( timeleft / 3600000 ); //60*60*1000 = 3600000
 		hrs = (hrs>9)?hrs:('0'+hrs);
 		var mins = Math.floor( (timeleft % 3600000) / 60000 );
@@ -115,11 +161,33 @@ function refreshCountdown() {
 
 // see: https://github.com/nwjs/nw.js/wiki/Shortcut
 function hotkeys() {
+	// pause/play
+	var shortcutPausePlay = new gui.Shortcut( {
+		key : 'Ctrl+P',
+		active : function () {
+			if ( pausedTime ) { // if paused, unpause and play
+				var timeDifference = (new Date).getTime() - pausedTime;
+				endTime.setTime( endTime.getTime() + timeDifference );
+				updates.className = 'fade-out';
+				pausedTime = null;
+			}
+			else { // if playing, set paused time
+				updates.innerHTML = `paused`;
+				updates.className = 'blink';
+				pausedTime = (new Date).getTime();
+			}
+		},
+		failed : function(msg) {
+			console.log(msg);
+		}
+	} );
+	gui.App.registerGlobalHotKey(shortcutPausePlay);
+
 	// +5 minutes
 	var shortcutPlusFive = new gui.Shortcut( {
 		key : 'Ctrl+Period',
 		active : function () {
-			if (endTime) {
+			if (endTime && !pausedTime) {
 				endTime.setTime( endTime.getTime() + 5*60*1000 );
 				fade('+5 min');
 			}
@@ -134,7 +202,7 @@ function hotkeys() {
 	var shortcutMinusFive = new gui.Shortcut( {
 		key : 'Shift+Ctrl+Period',
 		active : function () {
-			if (endTime) {
+			if (endTime && !pausedTime) {
 				endTime.setTime( endTime.getTime() - 5*60*1000 );
 				fade('-5 min');
 			}
@@ -149,7 +217,7 @@ function hotkeys() {
 	var shortcutPlusOne = new gui.Shortcut( {
 		key : 'Ctrl+Comma',
 		active : function () {
-			if (endTime) {
+			if (endTime && !pausedTime) {
 				endTime.setTime( endTime.getTime() + 1*60*1000 );
 				fade('+1 min');
 			}
@@ -164,7 +232,7 @@ function hotkeys() {
 	var shortcutMinusOne = new gui.Shortcut( {
 		key : 'Shift+Ctrl+Comma',
 		active : function () {
-			if (endTime) {
+			if (endTime && !pausedTime) {
 				endTime.setTime( endTime.getTime() - 1*60*1000 );
 				fade('-1 min');
 			}
@@ -182,7 +250,6 @@ function fade(text) {
 	setTimeout(function() {
 		updates.className = 'fade-out';
 	}, 1*1000);
-
 }
 
 </script>
